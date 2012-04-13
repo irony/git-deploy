@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -e
+
+oldrev=$1
+newrev=$2
+
+run() {
+  [ -x $1 ] && $1 $oldrev $newrev
+}
+
+echo files changed: $(git diff $oldrev $newrev --diff-filter=ACDMR --name-only | wc -l)
+
+umask 002
+
+git submodule init && git submodule sync && git submodule update
+
+RVM_ENVIRONMENT=/usr/local/rvm/environments/default
+
+if [[ -e $RVM_ENVIRONMENT ]]
+then
+  echo "Loading rvm environment from $RVM_ENVIRONMENT"
+  source $RVM_ENVIRONMENT
+else
+  echo "WARNING: No RVM environment file: $RVM_ENVIRONMENT"
+fi
+
+run deploy/after_push.rb

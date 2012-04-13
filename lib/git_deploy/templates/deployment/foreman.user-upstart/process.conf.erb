@@ -1,0 +1,13 @@
+start on starting <%= app %>-<%= process.name %>
+stop on stopping <%= app %>-<%= process.name %>
+respawn
+
+script
+bash -i <<"EOF"
+	cd <%= engine.directory %>
+	export HOME=<%= Dir.home %>
+	export USER=<%= ENV["USER"] %>
+  export PORT=<%= port %>
+  <%= process.command %> >> <%= log_root %>/<%=process.name%>-<%=num%>.log 2>&1
+EOF
+end script
